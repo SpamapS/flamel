@@ -1,0 +1,14 @@
+*.egg
+*.egg-info
+*.pyc
+.test
+.testrepository
+.tox
+.venv
+AUTHORS
+build/*
+ChangeLog
+config
+doc/build/*
+zuul/versioninfo
+dist/
