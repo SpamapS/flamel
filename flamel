@@ -15,10 +15,39 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import collections
 import sys
 import yaml
 import json
 import os
+
+
+class YamlOrderedLoader(yaml.Loader):
+    """Specialized Loader which respects order."""
+
+
+def construct_mapping(loader, node):
+    loader.flatten_mapping(node)
+    return collections.OrderedDict(loader.construct_pairs(node))
+
+YamlOrderedLoader.add_constructor(
+    yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+    construct_mapping)
+
+
+def yaml_dump(data, stream=None, Dumper=yaml.Dumper, **kwds):
+    class OrderedDumper(Dumper):
+        pass
+    def _dict_representer(dumper, data):
+        return dumper.represent_mapping(
+            yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+            data.items())
+    def unicode_representer(dumper, uni):
+        node = yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
+        return node
+    OrderedDumper.add_representer(collections.OrderedDict, _dict_representer)
+    OrderedDumper.add_representer(unicode, unicode_representer)
+    return yaml.dump(data, stream, OrderedDumper, **kwds)
 
 infile_path = sys.argv[1]
 if infile_path == '-':
@@ -33,19 +62,19 @@ else:
 
 intext = infile.read()
 try:
-    x = json.loads(intext)
+    x = json.loads(intext, object_pairs_hook=collections.OrderedDict)
 except ValueError as e:
     if 'debug' in sys.argv:
         sys.stderr.write(str(e))
-    x = yaml.load_all(intext)
+    x = yaml.load_all(intext, Loader=YamlOrderedLoader)
     for doc in x:
         if indent:
-            print(json.dumps(doc, indent=indent))
+            print(json.dumps(doc, indent=indent, sort_keys=False))
         else:
-            print(json.dumps(doc))
+            print(json.dumps(doc, sort_keys=False))
 else:
     if 'flow' in sys.argv:
         flow=True
     else:
         flow=False
-    print yaml.safe_dump(x, default_flow_style=flow)
+    print yaml_dump(x, default_flow_style=flow)
