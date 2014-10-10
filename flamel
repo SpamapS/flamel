@@ -69,7 +69,8 @@ except ValueError as e:
     x = yaml.load_all(intext, Loader=YamlOrderedLoader)
     for doc in x:
         if indent:
-            print(json.dumps(doc, indent=indent, sort_keys=False))
+            print(json.dumps(doc, indent=indent,
+                             separators=(',', ': '), sort_keys=False))
         else:
             print(json.dumps(doc, sort_keys=False))
 else:
