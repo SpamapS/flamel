@@ -22,7 +22,7 @@ import json
 import os
 
 
-class YamlOrderedLoader(yaml.Loader):
+class YamlOrderedLoader(yaml.SafeLoader):
     """Specialized Loader which respects order."""
 
 
