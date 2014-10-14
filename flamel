@@ -78,4 +78,4 @@ else:
         flow=True
     else:
         flow=False
-    print yaml_dump(x, default_flow_style=flow)
+    print(yaml_dump(x, default_flow_style=flow))
