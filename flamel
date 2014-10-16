@@ -70,7 +70,8 @@ except ValueError as e:
     for doc in x:
         if indent:
             print(json.dumps(doc, indent=indent,
-                             separators=(',', ': '), sort_keys=False))
+                             separators=(',', ': '), sort_keys=False,
+                             default=unicode))
         else:
             print(json.dumps(doc, sort_keys=False))
 else:
