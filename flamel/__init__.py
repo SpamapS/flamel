@@ -46,6 +46,7 @@ def yaml_dump(data, stream=None, Dumper=yaml.Dumper, **kwds):
         node = yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
         return node
     OrderedDumper.add_representer(collections.OrderedDict, _dict_representer)
+    OrderedDumper.add_representer(collections.defaultdict, _dict_representer)
     OrderedDumper.add_representer(unicode, unicode_representer)
     return yaml.dump(data, stream, OrderedDumper, **kwds)
 
