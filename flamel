@@ -50,6 +50,10 @@ def yaml_dump(data, stream=None, Dumper=yaml.Dumper, **kwds):
     return yaml.dump(data, stream, OrderedDumper, **kwds)
 
 
+def yaml_load(data):
+    return yaml.load_all(data, Loader=YamlOrderedLoader)
+
+
 def main():
     infile_path = sys.argv[1]
     if infile_path == '-':
@@ -68,7 +72,7 @@ def main():
     except ValueError as e:
         if 'debug' in sys.argv:
             sys.stderr.write(str(e))
-        x = yaml.load_all(intext, Loader=YamlOrderedLoader)
+        x = yaml_load(intext)
         for doc in x:
             if indent:
                 print(json.dumps(doc, indent=indent,
