@@ -46,37 +46,48 @@ def yaml_dump(data, stream=None, Dumper=yaml.Dumper, **kwds):
         node = yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
         return node
     OrderedDumper.add_representer(collections.OrderedDict, _dict_representer)
+    OrderedDumper.add_representer(collections.defaultdict, _dict_representer)
     OrderedDumper.add_representer(unicode, unicode_representer)
     return yaml.dump(data, stream, OrderedDumper, **kwds)
 
-infile_path = sys.argv[1]
-if infile_path == '-':
-    infile = sys.stdin
-else:
-    infile = open(infile_path)
 
-if len(sys.argv) > 2:
-    indent = int(sys.argv[2])
-else:
-    indent = 2
+def yaml_load(data):
+    return yaml.load_all(data, Loader=YamlOrderedLoader)
 
-intext = infile.read()
-try:
-    x = json.loads(intext, object_pairs_hook=collections.OrderedDict)
-except ValueError as e:
-    if 'debug' in sys.argv:
-        sys.stderr.write(str(e))
-    x = yaml.load_all(intext, Loader=YamlOrderedLoader)
-    for doc in x:
-        if indent:
-            print(json.dumps(doc, indent=indent,
-                             separators=(',', ': '), sort_keys=False,
-                             default=unicode))
-        else:
-            print(json.dumps(doc, sort_keys=False))
-else:
-    if 'flow' in sys.argv:
-        flow=True
+
+def main():
+    infile_path = sys.argv[1]
+    if infile_path == '-':
+        infile = sys.stdin
     else:
-        flow=False
-    print(yaml_dump(x, default_flow_style=flow))
+        infile = open(infile_path)
+
+    if len(sys.argv) > 2:
+        indent = int(sys.argv[2])
+    else:
+        indent = 2
+
+    intext = infile.read()
+    try:
+        x = json.loads(intext, object_pairs_hook=collections.OrderedDict)
+    except ValueError as e:
+        if 'debug' in sys.argv:
+            sys.stderr.write(str(e))
+        x = yaml_load(intext)
+        for doc in x:
+            if indent:
+                print(json.dumps(doc, indent=indent,
+                                 separators=(',', ': '), sort_keys=False,
+                                 default=unicode))
+            else:
+                print(json.dumps(doc, sort_keys=False))
+    else:
+        if 'flow' in sys.argv:
+            flow=True
+        else:
+            flow=False
+        print(yaml_dump(x, default_flow_style=flow))
+
+
+if __name__ == '__main__':
+    main()
