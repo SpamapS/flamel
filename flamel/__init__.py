@@ -21,6 +21,8 @@ import yaml
 import json
 import os
 
+import six
+
 
 class YamlOrderedLoader(yaml.SafeLoader):
     """Specialized Loader which respects order."""
@@ -47,7 +49,7 @@ def yaml_dump(data, stream=None, Dumper=yaml.Dumper, **kwds):
         return node
     OrderedDumper.add_representer(collections.OrderedDict, _dict_representer)
     OrderedDumper.add_representer(collections.defaultdict, _dict_representer)
-    OrderedDumper.add_representer(unicode, unicode_representer)
+    OrderedDumper.add_representer(six.text_type, unicode_representer)
     return yaml.dump(data, stream, OrderedDumper, **kwds)
 
 
@@ -78,7 +80,7 @@ def main():
             if indent:
                 print(json.dumps(doc, indent=indent,
                                  separators=(',', ': '), sort_keys=False,
-                                 default=unicode))
+                                 default=six.text_type))
             else:
                 print(json.dumps(doc, sort_keys=False))
     else:

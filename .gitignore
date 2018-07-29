@@ -1,4 +1,5 @@
 *.egg
+.eggs/
 *.egg-info
 *.pyc
 .test
